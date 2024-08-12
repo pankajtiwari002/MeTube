@@ -37,7 +37,7 @@ app.options("/api/auth/google", cors(corsOptions)); // Enable pre-flight request
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   connect();
   console.log("Server is running on port 3000");
 });
