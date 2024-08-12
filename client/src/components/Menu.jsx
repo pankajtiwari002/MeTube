@@ -1,21 +1,52 @@
+import React, { useState } from "react";
+import styled from "styled-components";
+import logoImg from "../img/logo.png";
+import { Scrollbar } from "react-scrollbars-custom";
+import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
+import Cookies from 'js-cookie';
 
-import React from 'react'
-import styled from 'styled-components'
-import logoImg from '../img/logo.png'
-import { AccountCircleOutlined, ArticleOutlined, Explore, ExploreOutlined, FlagOutlined, HelpOutlineOutlined, HistoryOutlined, Home, HomeMini, LibraryMusicOutlined, LiveTvOutlined, MovieOutlined, SettingsOutlined, SportsBasketballOutlined, SportsEsportsOutlined, Subscriptions, VideoLibraryOutlined } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import {
+  AccountCircleOutlined,
+  ArticleOutlined,
+  ExploreOutlined,
+  FlagOutlined,
+  HelpOutlineOutlined,
+  HistoryOutlined,
+  Home,
+  LibraryMusicOutlined,
+  LiveTvOutlined,
+  MovieOutlined,
+  SettingsOutlined,
+  SportsBasketballOutlined,
+  SportsEsportsOutlined,
+  Subscriptions,
+  VideoLibraryOutlined,
+} from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/userSlice";
+
 // css
 
+const MainContainer = styled.div`
+  width: 0px;
+  transition: width 0.3s ease;
+  @media (min-width: 1300px) {
+    width: ${({ isOpen }) => (isOpen ? "200px" : "20px")};
+  }
+`;
+
 const Container = styled.div`
-  flex: 1;
-  background: ${({theme}) => theme.bgLighter};
-  // height: calc((100vh - 100%) / 2)
-  color: ${({theme}) => theme.text};
+  background: ${({ theme }) => theme.bg};
+  color: ${({ theme }) => theme.text};
   font-size: 14px;
-  position: sticky;
-  top: 0;
-  // overflow-y: auto;
+  position: fixed;
+  /* top: 0; */
+  left: ${({ isOpen }) => (isOpen ? "0" : "-100%")};
+  height: 100vh;
+  width: 200px;
+  z-index: 1000;
+  transition: left 0.3s ease;
 `;
 
 const Wrapper = styled.div`
@@ -25,14 +56,18 @@ const Wrapper = styled.div`
 const Logo = styled.div`
   display: flex;
   align-items: center;
+  align-content: center;
   gap: 5px;
   font-weight: bold;
   margin-bottom: 25px;
+  @media (min-width: 760px) {
+    display: none;
+  }
 `;
 
 const Img = styled.img`
   height: 25px;
-`
+`;
 
 const Item = styled.div`
   display: flex;
@@ -42,18 +77,16 @@ const Item = styled.div`
   cursor: pointer;
 
   &:hover {
-    background-color: ${({theme}) => theme.soft};
+    background-color: ${({ theme }) => theme.soft};
   }
-
-`
+`;
 
 const Hr = styled.hr`
-  border: 0.5px solid ${({theme}) => theme.soft};
+  border: 0.5px solid ${({ theme }) => theme.soft};
   margin: 15px 0px;
-`
+`;
 
-const Login = styled.div`
-`
+const Login = styled.div``;
 const Button = styled.button`
   margin-top: 10px;
   padding: 5px 15px;
@@ -66,7 +99,7 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 5px;
-`
+`;
 const Title = styled.h2`
   font-size: 14px;
   font-weight: 500;
@@ -74,116 +107,161 @@ const Title = styled.h2`
   margin-bottom: 20px;
 `;
 
+const Hamburger = styled.div`
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+`;
 
-const Menu = ({darkMode, setDarkMode}) => {
+const Gap = styled.div`
+  height: 20px;
+`;
 
-  const {currentUser} = useSelector(state => state.user);
+const Menu = ({ darkMode, setDarkMode }) => {
+  const { currentUser } = useSelector((state) => state.user);
+  const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch()
 
-  const changeMode = () => {
-    setDarkMode((prev) => !prev)
+  const handleLogOut = () => {
+    Cookies.remove('access_token', { path: '/' });
+    localStorage.removeItem('persist:root');
+    Promise.resolve(dispatch(logout()));
   }
 
+  const changeMode = () => {
+    setDarkMode((prev) => !prev);
+  };
+
+  const toggleMenu = () => {
+    setIsOpen((prev) => !prev);
+  };
+
   return (
-    <Container>
-        <Wrapper>
-        <Link to="/" style={{textDecoration: "none",color: "inherit"}}>
-          <Logo>
-            <Img src={logoImg} />
-            YouTube
-          </Logo>
-        </Link>
-        <Link to="/" style={{textDecoration: "none",color: "inherit"}}>
-          <Item>
-            <Home />
-            Home
-          </Item>
-        </Link>
-        <Link to="/trend" style={{textDecoration: "none",color: "inherit"}}>
-          <Item>
-          <ExploreOutlined />
-          Explore
-          </Item>
-        </Link>
-        <Link to="/sub" style={{textDecoration: "none",color: "inherit"}}>
-          <Item>
-          <Subscriptions />
-            Subscription
-          </Item>
-        </Link>
-          <Hr />
-          <Item>
-            <VideoLibraryOutlined />
-            Library
-          </Item>
+    <MainContainer isOpen={isOpen}>
+      <Hamburger onClick={toggleMenu}>
+        {isOpen ? <CloseIcon /> : <MenuIcon />}
+      </Hamburger>
+        <Container isOpen={isOpen}>
+          <Scrollbar style={{ width: "200px", height: "100vh" }}>
+          <Wrapper>
+            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+              <Logo>
+                <Img src={logoImg} />
+                VidZilla
+              </Logo>
+            </Link>
+            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+              <Item>
+                <Home />
+                Home
+              </Item>
+            </Link>
+            <Link
+              to="/trend"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item>
+                <ExploreOutlined />
+                Explore
+              </Item>
+            </Link>
+            <Link
+              to="/sub"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item>
+                <Subscriptions />
+                Subscription
+              </Item>
+            </Link>
+            <Hr />
+            <Item>
+              <VideoLibraryOutlined />
+              Library
+            </Item>
+            <Link to="/history" style={{ textDecoration: "none", color: "inherit" }}>
+              <Item>
+                <HistoryOutlined />
+                History
+              </Item>
+            </Link>
+            {!currentUser ? (
+              <>
+                <Login>
+                  <Link to="signin" style={{ textDecoration: "none" }}>
+                    <Button>
+                      <AccountCircleOutlined />
+                      SIGN IN
+                    </Button>
+                  </Link>
+                </Login>
+                <Hr />
+              </>
+            ) : (
+              <>
+                <Login onClick={handleLogOut}>
+                    <Button>
+                      <AccountCircleOutlined />
+                      SIGN OUT
+                    </Button>
+                </Login>
+                <Hr />
+              </>
+            )}
+            <Title>Best of YouTube</Title>
+            <Item>
+              <LibraryMusicOutlined />
+              Music
+            </Item>
+            <Item>
+              <SportsBasketballOutlined />
+              Sports
+            </Item>
+            <Item>
+              <SportsEsportsOutlined />
+              Gaming
+            </Item>
+            <Item>
+              <MovieOutlined />
+              Movies
+            </Item>
+            <Item>
+              <ArticleOutlined />
+              News
+            </Item>
+            <Item>
+              <LiveTvOutlined />
+              Live
+            </Item>
+            <Hr />
+            <Item>
+              <SettingsOutlined />
+              Settings
+            </Item>
+            <Item>
+              <FlagOutlined />
+              Support
+            </Item>
+            <Item>
+              <HelpOutlineOutlined />
+              Help
+            </Item>
+            <Item onClick={changeMode}>
+              <Subscriptions />
+              {darkMode ? "Light Mode" : "Dark Mode"}
+            </Item>
+          </Wrapper>
+          <Gap />
+          <Gap />
+          <Gap />
+      </Scrollbar>
+        </Container>
+    </MainContainer>
+  );
+};
 
-          <Item>
-            <HistoryOutlined />
-            History
-          </Item>
-          {!currentUser && <>
-            <Login>
-              Sign in to like videos, comments and subscribe.
-              <Link to="signin" style={{textDecoration: "none"}}>
-              <Button>
-                <AccountCircleOutlined />
-                SIGN IN
-              </Button>
-              </Link>
-            </Login>
-          <Hr />
-          </>
-          }
-          {/* <Title>Best of YouTube</Title>
-          <Item>
-            <LibraryMusicOutlined />
-            Music
-          </Item> */}
-          {/* <Item>
-            <SportsBasketballOutlined />
-            Sports
-          </Item>
-
-          <Item>
-            <SportsEsportsOutlined />
-            Gaming
-          </Item> */}
-
-          {/* <Item>
-            <MovieOutlined />
-            Movies
-          </Item> */}
-          {/* <Item>
-            <ArticleOutlined />
-            News
-          </Item> */}
-
-          {/* <Item>
-            <LiveTvOutlined />
-            Live
-          </Item> */}
-          {/* <Hr /> */}
-
-          <Item>
-            <SettingsOutlined />
-            Settings
-          </Item>
-          <Item>
-            <FlagOutlined />
-            Support
-          </Item>
-
-          <Item>
-            <HelpOutlineOutlined />
-            help
-          </Item>
-
-          <Item onClick={changeMode}>
-            <Subscriptions />
-            {darkMode? "Light Mode" : "Dark Mode"}
-          </Item>
-        </Wrapper>
-    </Container>
-  )
-}
-
-export default Menu
+export default Menu;

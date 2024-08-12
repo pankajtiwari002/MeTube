@@ -1,5 +1,5 @@
 import express from "express"
-import { deleteUser, dislike, getUser, like, subscribe, unsubscribe, update } from "../controllers/user.js"
+import { deleteUser, dislike, getUser, like, subscribe, unsubscribe, update,getAllSubscribedChannels } from "../controllers/user.js"
 import { verifyToken } from "../verifyToken.js"
 
 const router = express.Router()
@@ -24,5 +24,8 @@ router.put("/like/:videoId",verifyToken,like)
 
 //dislike a video
 router.put("/dislike/:videoId",verifyToken,dislike)
+
+//getSubscribedUser
+router.get("/sub/:id",verifyToken,getAllSubscribedChannels)
 
 export default router

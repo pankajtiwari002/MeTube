@@ -11,8 +11,8 @@ const Container = styled.div`
 `;
 
 const Avatar = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
 `;
 
@@ -20,7 +20,7 @@ const Details = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  color: ${({ theme }) => theme.text}
+  color: ${({ theme }) => theme.text};
 `;
 const Name = styled.span`
   font-size: 13px;
@@ -38,20 +38,20 @@ const Text = styled.span`
   font-size: 14px;
 `;
 
-const Comment = ({comment}) => {
-  const [user,setUser] = useState({})
+const Comment = ({ comment }) => {
+  const [user, setUser] = useState({});
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`${api}/users/find/${comment.userId}`)
-        console.log(res.data)
-        setUser(res.data)
+        const res = await axios.get(`${api}/users/find/${comment.userId}`);
+        console.log(res.data);
+        setUser(res.data);
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
-    }
-    fetchUser()
-  },[comment.userId])
+    };
+    fetchUser();
+  }, [comment.userId]);
   return (
     <Container>
       <Avatar src={user.img} />
@@ -59,9 +59,7 @@ const Comment = ({comment}) => {
         <Name>
           {user.name} <Date>{format(comment?.createdAt)}</Date>
         </Name>
-        <Text>
-          {comment.desc}
-        </Text>
+        <Text>{comment.desc}</Text>
       </Details>
     </Container>
   );

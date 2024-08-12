@@ -2,18 +2,25 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Card from "./Card.jsx";
-import {api} from '../constant.js'
+import { api } from "../constant.js";
 
 const Container = styled.div`
   flex: 4;
+  @media (max-width: 1200px) {
+    flex: content;
+    margin-bottom: 50px;
+  }
 `;
 
-const Recommendation = ({ tags }) => {
+const Recommendation = ({ currentVideoId, tags }) => {
   const [videos, setVideos] = useState([]);
 
   useEffect(() => {
     const fetchVideos = async () => {
-      const res = await axios.get(`${api}/videos/tags?tags=${tags}`);
+      console.log(tags);
+      const url = `${api}/videos/tags?tags=${tags}`;
+      console.log(url);
+      const res = await axios.get(url);
       setVideos(res.data);
     };
     fetchVideos();
@@ -21,9 +28,12 @@ const Recommendation = ({ tags }) => {
 
   return (
     <Container>
-      {videos.map((video) => (
-        <Card type="sm" key={video._id} video={video} />
-      ))}
+      {videos.map(
+        (video) =>
+          currentVideoId !== video._id && (
+            <Card type="sm" key={video._id} video={video} />
+          )
+      )}
     </Container>
   );
 };

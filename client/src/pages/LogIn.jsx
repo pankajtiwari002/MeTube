@@ -14,6 +14,7 @@ import {
   getDownloadURL,
   getStorage,
   ref,
+  uploadBytes,
   uploadBytesResumable,
 } from "firebase/storage";
 import app from "../firebase.js";
@@ -26,55 +27,47 @@ const Container = styled.div`
   position: relative;
   overflow: hidden;
   margin: auto;
-  width: 90%;
-  max-width: 400px;
+  width: 678px;
+  max-width: 100%;
   min-height: 500px;
-  @media (max-width: 760px) {
+  @media (min-width: 760px) {
     display: flex;
-    flex-direction: column;
   }
 `;
 
-const Row = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-`;
-
-const SectionContainer = styled.div`
-  width: 45%;
-  max-width: 200px;
-  padding: 10px;
-  background: ${(props) => props.signIn ? "linear-gradient(to right, #ff4b2b, #ff416c)": "#fff"};
-  color: ${(props) => props.signIn ? "white": "black"};
-  text-align: center;
-  cursor: pointer;
-  
+const SignUpContainer = styled.div`
+  position: absolute;
+  top: 0; 
+  height: 100%;
+  transition: all 0.6s ease-in-out;
+  left: 0;
+  width: 50%;
+  opacity: 0;
+  z-index: 1;
+  ${(props) =>
+    props.signinIn !== true
+      ? `
+   transform: translateX(100%);
+   opacity: 1;
+   z-index: 5;
+ `
+      : null} 
 `;
 
 const SignInContainer = styled.div`
-  margin-top: 10px;
-  display: ${({ visible }) => (visible ? "flex" : "none")};
-  /* justify-content: center;
-  align-items: center;
-  align-content: center; */
-  width: 100%;
-  padding: 10%;
-  background-color: #fff;
-`;
-
-const SignUpContainer = styled.div`
-  margin-top: 10px;
-  display: ${({ visible }) => (visible ? "flex" : "none")};
-  /* align-items: center;
-  align-content: center; */
-  width: 100%;
-  padding: 10%; 
-  background-color: #fff;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s ease-in-out;
+  left: 0;
+  width: 50%;
+  z-index: 2;
+  ${(props) =>
+    props.signinIn !== true ? `transform: translateX(100%);` : null}
 `;
 
 const Form = styled.form`
-  background-color: white;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,8 +77,13 @@ const Form = styled.form`
   text-align: center;
 `;
 
+const Title = styled.h1`
+  font-weight: bold;
+  margin: 0;
+`;
+
 const Input = styled.input`
-  display: ${(props) => (props.visible ? "flex" : "none")};
+  display: ${(props) => props.visible ? "flex" : "none"};
   background-color: #eee;
   border: none;
   padding: 12px 15px;
@@ -97,7 +95,7 @@ const Button = styled.button`
   border-radius: 20px;
   border: 1px solid #ff4b2b;
   background-color: #ff4b2b;
-  display: ${(props) => (props.visible ? "flex" : "none")};
+  display: ${(props) => props.visible ? "flex" : "none"};
   color: #ffffff;
   font-size: 12px;
   font-weight: bold;
@@ -126,7 +124,6 @@ const GoogleButton = styled.div`
   display: flex;
   align-content: center;
   align-items: center;
-  font-size: 14px;
   &:hover {
     cursor: pointer;
   }
@@ -138,11 +135,79 @@ const Image = styled.img`
   margin-right: 5px;
 `;
 
+const GhostButton = styled(Button)`
+  background-color: transparent;
+  border-color: #ffffff;
+`;
+
 const Anchor = styled.a`
   color: #333;
   font-size: 14px;
   text-decoration: none;
   margin: 15px 0;
+`;
+const OverlayContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden; 
+  transition: transform 0.6s ease-in-out;
+  z-index: 100;
+  ${(props) =>
+    props.signinIn !== true ? `transform: translateX(-100%);` : null}
+`;
+
+const Overlay = styled.div`
+  background: #ff416c;
+  background: -webkit-linear-gradient(to right, #ff4b2b, #ff416c);
+  background: linear-gradient(to right, #ff4b2b, #ff416c);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 0 0;
+  color: #ffffff;
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+  ${(props) => (props.signinIn !== true ? `transform: translateX(50%);` : null)}
+`;
+
+const OverlayPanel = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 0px;
+  text-align: center;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+`;
+
+const LeftOverlayPanel = styled(OverlayPanel)`
+  transform: translateX(-20%);
+  ${(props) => (props.signinIn !== true ? `transform: translateX(0);` : null)}
+`;
+
+const RightOverlayPanel = styled(OverlayPanel)`
+  right: 0;
+  transform: translateX(0);
+  ${(props) => (props.signinIn !== true ? `transform: translateX(20%);` : null)}
+`;
+
+const Paragraph = styled.p`
+  font-size: 14px;
+  font-weight: 100;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  margin: 20px 30px;
 `;
 
 const ImageContainer = styled.div`
@@ -173,18 +238,18 @@ const DangerMessage = styled.p`
   color: red;
   font-size: 14px;
   font-weight: 500;
-  display: ${(props) => (props.visible ? "flex" : "none")};
+  display: ${(props) => props.visible ? "flex" : "none"};
   margin-bottom: 5px;
 `;
 
-const App = () => {
-  const [isSignIn, setIsSignIn] = useState(true);
+const LogIn = () => {
   const [imageSrc, setImageSrc] = useState(null);
   const [image, setImage] = useState(null);
   const [isEmailVerify, setIsEmailVerify] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [otp, setOtp] = useState("");
+  const [otp,setOtp] = useState("");
+  const [signIn, toggle] = useState(true);
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState("");
   const [createPassword, setCreatePassword] = useState("");
@@ -196,7 +261,7 @@ const App = () => {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    setImage(file);
+    setImage(file)
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
@@ -233,29 +298,29 @@ const App = () => {
   const sendOtp = async (e) => {
     try {
       e.preventDefault();
-      setErrorMessage("");
-      console.log("hello1");
-      if (username.trim().length === 0) {
-        setErrorMessage("First Fill the Name");
+      setErrorMessage("")
+      console.log("hello1")
+      if(username.trim().length === 0){
+        setErrorMessage("First Fill the Name")
+        return
+      }
+      if(!validateEmail(email)){
+        console.log("hello2")
+        setErrorMessage("Invalid Email")
         return;
       }
-      if (!validateEmail(email)) {
-        console.log("hello2");
-        setErrorMessage("Invalid Email");
-        return;
-      }
-      console.log("hello3");
+      console.log("hello3")
       const res = await axios.post(`${api}/auth/sendotp`, {
         username,
         email,
       });
-      console.log(res.data);
-      console.log("hello4");
+      console.log(res.data)
+      console.log("hello4")
       if ("error" in res.data) {
-        console.log("hello5");
+        console.log("hello5")
         setErrorMessage(res.data.error);
-      }
-      if ("success" in res.data) {
+      } 
+      if("success" in res.data) {
         setIsOtpSent(true);
       }
     } catch (error) {
@@ -266,80 +331,89 @@ const App = () => {
   const verifyOtp = async (e) => {
     try {
       e.preventDefault();
-      setErrorMessage("");
-      const res = await axios.post(`${api}/auth/verifyotp`, {
+      setErrorMessage("")
+      const res = await axios.post(`${api}/auth/verifyotp`,{
         email,
-        otp,
+        otp
       });
-      if ("error" in res.data) {
-        setErrorMessage(res.data.error);
-      } else {
-        setIsEmailVerify(true);
+      console.log(res.data)
+      if(res.data.error){
+        setErrorMessage(res.data.error)
+      }
+      else{
+        setIsEmailVerify(true)
       }
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
 
   const handleSignUp = async (e) => {
     try {
       e.preventDefault();
       setErrorMessage("");
+  
+      // Validate password
       if (!validatePassword(createPassword)) {
-        setErrorMessage(
-          "Password must be 8+ characters with letters, numbers, and symbols"
-        );
+        setErrorMessage("Password must be 8+ characters with letters, numbers, and symbols");
         return;
       }
+  
       dispatch(loginStart());
       let imageUrl = "";
+      console.log(imageSrc)
+      // If an image is provided, upload it to Firebase and get the URL
       if (imageSrc) {
         const storage = getStorage(app);
-        const imagePath = imageSrc.split("/");
-        const imageName = imagePath[imagePath.length - 1].split(".")[0];
-        const fileName =
-          imageName + Math.random().toString(16).slice(2).toString();
+        const imagePath = imageSrc.split('/');
+        const imageName = imagePath[imagePath.length - 1].split('.')[0];
+        const fileName = imageName + Math.random().toString(16).slice(2);
         const storageRef = ref(storage, fileName);
         const uploadTask = uploadBytesResumable(storageRef, image);
-        const res = await uploadTask.on(
-          "state_changed",
-          (snapshot) => {},
-          (error) => {
-            console.log("firebase Error: ", error.message);
-          },
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              imageUrl = downloadURL;
-            });
-          }
-        );
+  
+        // Await the image upload completion and retrieve the download URL
+        await new Promise((resolve, reject) => {
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {},
+            (error) => {
+              console.error("Firebase Error:", error.message);
+              reject(error);
+            },
+            async () => {
+              imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve();
+            }
+          );
+        });
       }
+      console.log(imageUrl)
+      // Proceed to send the API request with the image URL (if any)
       const res = await axios.post(
         `${api}/auth/signup`,
         {
           email,
           name: username,
           password: createPassword,
-          img: imageUrl,
+          img: imageUrl, // Send the image URL here
         },
         {
           withCredentials: true,
-          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      console.log(document.cookie);
-      if (res.status === "404") {
-        console.log("user not found");
+      console.log(res)
+      // Handle the response
+      if (res.status === 404) {
+        console.log("User not found");
         dispatch(loginFailure());
-      } else if (res.status == "400") {
-        console.log("wrong credential");
+      } else if (res.status === 400) {
+        console.log("Wrong credentials");
         dispatch(loginFailure());
       } else {
         const user = res.data;
-        // document.cookie = `access_token=${user["access_token"]}`;
         console.log(res);
         console.log(user);
         dispatch(loginSuccess(user));
@@ -350,11 +424,12 @@ const App = () => {
       dispatch(loginFailure());
     }
   };
-
+  
   const handleSignIn = async (e) => {
     try {
       e.preventDefault();
       dispatch(loginStart());
+      console.log(name,password)
       const res = await axios.post(
         `${api}/auth/signin`,
         {
@@ -363,7 +438,6 @@ const App = () => {
         },
         {
           withCredentials: true,
-          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -419,50 +493,18 @@ const App = () => {
         dispatch(loginFailure());
       });
   };
-
   return (
     <Container>
-      <Row>
-        <SectionContainer signIn={isSignIn} onClick={() => setIsSignIn(true)}>
-          Sign In
-        </SectionContainer>
-        <SectionContainer signIn={!isSignIn} onClick={() => setIsSignIn(false)}>
-          Sign Up
-        </SectionContainer>
-      </Row>
-      <SignInContainer visible={isSignIn}>
+      <SignUpContainer signinIn={signIn}>
         <Form>
-          <Input
-            visible={true}
-            type="text"
-            placeholder="Email"
-            onChange={(e) => setUserEmail(e.target.value)}
-          />
-          <Input
-            visible={true}
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Anchor href="#">Forgot your password?</Anchor>
-          <GoogleButton onClick={signInWithGoogle}>
-            {" "}
-            <Image src={GoogleImg} /> Continue With Google
-          </GoogleButton>
-          <Button visible={true} onClick={handleSignIn}>
-            Sigin In
-          </Button>
-        </Form>
-      </SignInContainer>
-      <SignUpContainer visible={!isSignIn}>
-        <Form>
+          <Title>Create Account</Title>
           <ImageContainer
-            onClick={() => document.getElementById("imgInput").click()}
+            onClick={() => document.getElementById("imageInput").click()}
           >
             <HiddenInput
               type="file"
               accept="image/*"
-              id="imgInput"
+              id="imageInput"
               onChange={handleImageChange}
             />
             <ProfileImage src={imageSrc || defaultImage} alt="Selected" />
@@ -480,29 +522,65 @@ const App = () => {
             onChange={(e) => setEmail(e.target.value)}
             readOnly={isEmailVerify}
           />
-          <OTPField visible={!isEmailVerify} setOtp={setOtp} />
+          <OTPField visible={!isEmailVerify} setOtp={setOtp}/>
           <Input
             visible={isEmailVerify}
             type="password"
             placeholder="Password"
             onChange={(e) => setCreatePassword(e.target.value)}
           />
-          <DangerMessage visible={errorMessage.trim() !== ""}>
-            {errorMessage}
-          </DangerMessage>
-          <Button visible={!isEmailVerify && !isOtpSent} onClick={sendOtp}>
-            Send OTP
-          </Button>
-          <Button visible={!isEmailVerify && isOtpSent} onClick={verifyOtp}>
-            Verify OTP
-          </Button>
-          <Button visible={isEmailVerify} onClick={handleSignUp}>
-            Sign Up
-          </Button>
+          <DangerMessage visible={errorMessage.trim()!==""}>{errorMessage}</DangerMessage>
+          <Button visible={!isEmailVerify && !isOtpSent} onClick={sendOtp}>Send OTP</Button>
+          <Button visible={(!isEmailVerify && isOtpSent)} onClick={verifyOtp}>Verify OTP</Button>
+          <Button visible={isEmailVerify} onClick={handleSignUp}>Sign Up</Button>
         </Form>
       </SignUpContainer>
+
+      <SignInContainer signinIn={signIn}>
+        <Form>
+          <Title>Sign in</Title>
+          <Input
+            visible={true}
+            type="email"
+            placeholder="Email"
+            onChange={(e) => setUserEmail(e.target.value)}
+          />
+          <Input
+            visible={true}
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Anchor href="#">Forgot your password?</Anchor>
+          <GoogleButton onClick={signInWithGoogle}>
+            {" "}
+            <Image src={GoogleImg} /> Continue With Google
+          </GoogleButton>
+          <Button visible={true} onClick={handleSignIn}>Sigin In</Button>
+        </Form>
+      </SignInContainer>
+
+      <OverlayContainer signinIn={signIn}>
+        <Overlay signinIn={signIn}>
+          <LeftOverlayPanel signinIn={signIn}>
+            <Title>Welcome Back!</Title>
+            <Paragraph>
+              To keep connected with us please login with your personal info
+            </Paragraph>
+            <GhostButton visible={true} onClick={() => toggle(true)}>Sign In</GhostButton>
+          </LeftOverlayPanel>
+
+          <RightOverlayPanel signinIn={signIn}>
+            <Title>Hello, Friend!</Title>
+            <Paragraph>
+              Enter Your personal details and start journey with us
+            </Paragraph>
+            <GhostButton visible={true} onClick={() => toggle(false)}>Sigin Up</GhostButton>
+          </RightOverlayPanel>
+        </Overlay>
+      </OverlayContainer>
     </Container>
   );
 };
 
-export default App;
+export default LogIn;

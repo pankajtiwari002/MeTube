@@ -102,3 +102,18 @@ export const dislike = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getAllSubscribedChannels = async (req,res,next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    const subscribedUserIds = user.subscribedUsers;
+    let subscribedUsers = [];
+    for(let id of subscribedUserIds){
+      const subscribedUser = await User.findById(id);
+      subscribedUsers.push(subscribedUser)
+    }
+    res.status(200).json(subscribedUsers)
+  } catch (err) {
+    next(err)
+  }
+}
