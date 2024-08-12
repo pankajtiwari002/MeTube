@@ -12,6 +12,8 @@ import sendOtp from "./util/mail.js";
 
 dotenv.config();
 
+const PORT = process.env.PORT || 3000;
+
 const connect = () => {
   mongoose
     .connect(process.env.MONGO)
