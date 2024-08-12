@@ -28,7 +28,7 @@ const connect = () => {
 const app = express();
 
 var corsOptions = {
-  origin: "https://vidzilla-frontend.onrender.com/",
+  origin: "https://vidzilla-frontend.onrender.com",
   credentials: true,
 };
 
