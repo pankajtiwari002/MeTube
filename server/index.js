@@ -12,6 +12,8 @@ import sendOtp from "./util/mail.js";
 
 dotenv.config();
 
+const PORT = process.env.PORT || 3000;
+
 const connect = () => {
   mongoose
     .connect(process.env.MONGO)
@@ -35,7 +37,7 @@ app.options("/api/auth/google", cors(corsOptions)); // Enable pre-flight request
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   connect();
   console.log("Server is running on port 3000");
 });
