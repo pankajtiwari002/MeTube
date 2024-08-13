@@ -96,7 +96,7 @@ export const signup = async (req, res, next) => {
         secure: true, // Ensures the cookie is only sent over HTTPS
         sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
         path: "/", // Available throughout the website
-        domain: "vidzilla-frontend.onrender.com",
+        domain: "onrender.com",
       })
       .status(201)
       .send("user has been created");
@@ -126,7 +126,7 @@ export const signin = async (req, res, next) => {
         secure: true, // Ensures the cookie is only sent over HTTPS
         sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
         path: "/", // Available throughout the website
-        domain: "vidzilla-frontend.onrender.com",
+        domain: "onrender.com",
       })
       .status(200)
       .json(others);
@@ -152,7 +152,7 @@ export const googleSignIn = async (req, res, next) => {
           secure: true, // Ensures the cookie is only sent over HTTPS
           sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
           path: "/", // Available throughout the website
-          domain: "vidzilla-frontend.onrender.com",
+          domain: "onrender.com",
         })
         .status(200)
         .json(user._doc);
@@ -170,7 +170,7 @@ export const googleSignIn = async (req, res, next) => {
           secure: true, // Ensures the cookie is only sent over HTTPS
           sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
           path: "/", // Available throughout the website
-          domain: "vidzilla-frontend.onrender.com",
+          domain: "onrender.com",
         })
         .status(200);
       // .json(savedUser._doc);
