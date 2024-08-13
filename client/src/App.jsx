@@ -28,26 +28,26 @@ function App() {
   const [darkMode, setDarkMode] = useState(true);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const removePersistUserIfNotAccessToken = async () => {
-      const cookies = document.cookie.split(";");
-      console.log(document.cookie)
-      let access_token = "";
-      for (let cookie of cookies) {
-        if (cookie.startsWith("access_token=")) {
-          access_token = cookie.substring(13);
-          break;
-        }
-      }
-      console.log(access_token);
-      if(access_token===""){
-        console.log("access_token = ",access_token)
-        localStorage.removeItem('persist:root');
-        Promise.resolve(dispatch(logout()));
-      }
-    }
-    removePersistUserIfNotAccessToken();
-  },[dispatch])
+  // useEffect(() => {
+  //   const removePersistUserIfNotAccessToken = async () => {
+  //     const cookies = document.cookie.split(";");
+  //     console.log(document.cookie)
+  //     let access_token = "";
+  //     for (let cookie of cookies) {
+  //       if (cookie.startsWith("access_token=")) {
+  //         access_token = cookie.substring(13);
+  //         break;
+  //       }
+  //     }
+  //     console.log(access_token);
+  //     if(access_token===""){
+  //       console.log("access_token = ",access_token)
+  //       localStorage.removeItem('persist:root');
+  //       Promise.resolve(dispatch(logout()));
+  //     }
+  //   }
+  //   removePersistUserIfNotAccessToken();
+  // },[dispatch])
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>

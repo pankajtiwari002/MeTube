@@ -4,76 +4,83 @@ import User from "../models/User.js";
 import { createError } from "../error.js";
 import jwt from "jsonwebtoken";
 import { json } from "express";
-import sendOtp from "../util/mail.js"
+import sendOtp from "../util/mail.js";
 import Otp from "../models/Otp.js";
 
-export const sendOtpUsingEmail = async (req,res,next) => {
+export const sendOtpUsingEmail = async (req, res, next) => {
   try {
-    const user = await User.findOne({email: req.body.email})
-    const otp = Math.floor(1000+8999*Math.random())
-    if(user){
-      res.status(409).json({'error': "email already exist"})
+    const user = await User.findOne({ email: req.body.email });
+    const otp = Math.floor(1000 + 8999 * Math.random());
+    if (user) {
+      res.status(409).json({ error: "email already exist" });
       return;
     }
-    const otpPrevRecord = await Otp.findOne({email: req.body.email});
-    if(otpPrevRecord){
+    const otpPrevRecord = await Otp.findOne({ email: req.body.email });
+    if (otpPrevRecord) {
       const date = new Date();
-      date = date.setMinutes(date.getMinutes()+5);
-      Otp.findOneAndUpdate({email: req.body.email},{$set: {otp: req.body.otp,expirationDate: new Date(Date.now() + 30000)}})
-      const info = await sendOtp(req.body.email,req.body.username,otp)
-      res.status(200).json({"success": "Send Otp Successfull"})
+      date = date.setMinutes(date.getMinutes() + 5);
+      Otp.findOneAndUpdate(
+        { email: req.body.email },
+        {
+          $set: {
+            otp: req.body.otp,
+            expirationDate: new Date(Date.now() + 30000),
+          },
+        }
+      );
+      const info = await sendOtp(req.body.email, req.body.username, otp);
+      res.status(200).json({ success: "Send Otp Successfull" });
       return;
     }
     const date = new Date();
-    date.setMinutes(date.getMinutes()+5);
+    date.setMinutes(date.getMinutes() + 5);
     const OtpModel = new Otp({
       email: req.body.email,
       otp: otp,
       expirationDate: date,
-    })
+    });
     await OtpModel.save();
-    const info = await sendOtp(req.body.email,req.body.username,otp)
-    res.status(200).json({"success": "Send Otp Successfull"})
+    const info = await sendOtp(req.body.email, req.body.username, otp);
+    res.status(200).json({ success: "Send Otp Successfull" });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
-export const verifyEmailUsingOtp = async (req,res,next) => {
+export const verifyEmailUsingOtp = async (req, res, next) => {
   try {
-    const otpRecord = await Otp.findOne({email: req.body.email})
-    console.log(otpRecord)
-    if(!otpRecord){
-      console.log('Otp not found or already used')
-      res.status(404).json({'error': 'Otp not found or already used'})
-    }
-    else if(Date.now() > otpRecord.expirationDate){
-      console.log('Otp expire')
-      const response = await Otp.findOneAndDelete({email: req.body.email})
-      res.status(400).json({'error': 'Otp Expire'})
-    }
-    else if(otpRecord.attempts > 5){
-      console.log('Too Many Attempts')
-      const response = await Otp.findOneAndDelete({email: req.body.email})
-      res.status(400).json({'error': "Too Many Attempts"})
-    }
-    else if(otpRecord.otp === req.body.otp){
-      console.log('Success')
-      res.status(200).json({"Success": "Email verified successfully"})
-    }
-    else {
-      console.log('Invalid Otp')
-      const response = await Otp.findOneAndUpdate({email: req.body.email},{$inc: {attempts: 1}});
-      res.status(400).json({'error': "Invalid Otp"})
+    const otpRecord = await Otp.findOne({ email: req.body.email });
+    console.log(otpRecord);
+    if (!otpRecord) {
+      console.log("Otp not found or already used");
+      res.status(404).json({ error: "Otp not found or already used" });
+    } else if (Date.now() > otpRecord.expirationDate) {
+      console.log("Otp expire");
+      const response = await Otp.findOneAndDelete({ email: req.body.email });
+      res.status(400).json({ error: "Otp Expire" });
+    } else if (otpRecord.attempts > 5) {
+      console.log("Too Many Attempts");
+      const response = await Otp.findOneAndDelete({ email: req.body.email });
+      res.status(400).json({ error: "Too Many Attempts" });
+    } else if (otpRecord.otp === req.body.otp) {
+      console.log("Success");
+      res.status(200).json({ Success: "Email verified successfully" });
+    } else {
+      console.log("Invalid Otp");
+      const response = await Otp.findOneAndUpdate(
+        { email: req.body.email },
+        { $inc: { attempts: 1 } }
+      );
+      res.status(400).json({ error: "Invalid Otp" });
     }
   } catch (error) {
-    next(err)
+    next(err);
   }
-}
+};
 
 export const signup = async (req, res, next) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     const salt = await bcrypt.genSalt(10);
     console.log(salt);
     const hash = bcrypt.hashSync(req.body.password, salt);
@@ -83,10 +90,16 @@ export const signup = async (req, res, next) => {
     await newUser.save();
     const token = jwt.sign({ id: newUser._id }, process.env.JWT);
     // res.status(201).send("User has been Created!");
-    res.cookie("access_token",token,{
-      // httpOnly: true,
-      SameSite: 'Lax',
-    }).status(201).send("user has been created")
+    res
+      .cookie("access_token", token, {
+        httpOnly: true, // Protects against XSS attacks
+        secure: true, // Ensures the cookie is only sent over HTTPS
+        sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
+        path: "/", // Available throughout the website
+        domain: "vidzilla-frontend.onrender.com",
+      })
+      .status(201)
+      .send("user has been created");
   } catch (err) {
     //todo
     console.log(err.message);
@@ -98,8 +111,8 @@ export const signin = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) return next(createError(404, "User not found!"));
-    console.log(req.body)
-    console.log(user)
+    console.log(req.body);
+    console.log(user);
 
     const isCorrect = await bcrypt.compare(req.body.password, user.password);
     if (!isCorrect) return next(createError(400, "Wrong Credentials"));
@@ -109,8 +122,11 @@ export const signin = async (req, res, next) => {
     others["access_token"] = token;
     res
       .cookie("access_token", token, {
-        // httpOnly: true,
-        SameSite: 'Lax',
+        httpOnly: true, // Protects against XSS attacks
+        secure: true, // Ensures the cookie is only sent over HTTPS
+        sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
+        path: "/", // Available throughout the website
+        domain: "vidzilla-frontend.onrender.com",
       })
       .status(200)
       .json(others);
@@ -132,8 +148,11 @@ export const googleSignIn = async (req, res, next) => {
       console.log("Hi4");
       res
         .cookie("access_token", token, {
-          // httpOnly: true,
-          SameSite: 'Lax',
+          httpOnly: true, // Protects against XSS attacks
+          secure: true, // Ensures the cookie is only sent over HTTPS
+          sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
+          path: "/", // Available throughout the website
+          domain: "vidzilla-frontend.onrender.com",
         })
         .status(200)
         .json(user._doc);
@@ -147,11 +166,14 @@ export const googleSignIn = async (req, res, next) => {
       console.log("Hello4");
       res
         .cookie("access_token", token, {
-          // httpOnly: true,
-          SameSite: 'Lax',
+          httpOnly: true, // Protects against XSS attacks
+          secure: true, // Ensures the cookie is only sent over HTTPS
+          sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
+          path: "/", // Available throughout the website
+          domain: "vidzilla-frontend.onrender.com",
         })
-        .status(200)
-        // .json(savedUser._doc);
+        .status(200);
+      // .json(savedUser._doc);
     }
   } catch (err) {
     next(err);
