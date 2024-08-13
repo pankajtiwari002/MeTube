@@ -85,6 +85,7 @@ export const signup = async (req, res, next) => {
     // res.status(201).send("User has been Created!");
     res.cookie("access_token",token,{
       // httpOnly: true,
+      SameSite: 'Lax',
     }).status(201).send("user has been created")
   } catch (err) {
     //todo
@@ -109,6 +110,7 @@ export const signin = async (req, res, next) => {
     res
       .cookie("access_token", token, {
         // httpOnly: true,
+        SameSite: 'Lax',
       })
       .status(200)
       .json(others);
@@ -131,6 +133,7 @@ export const googleSignIn = async (req, res, next) => {
       res
         .cookie("access_token", token, {
           // httpOnly: true,
+          SameSite: 'Lax',
         })
         .status(200)
         .json(user._doc);
@@ -144,10 +147,11 @@ export const googleSignIn = async (req, res, next) => {
       console.log("Hello4");
       res
         .cookie("access_token", token, {
-          httpOnly: true,
+          // httpOnly: true,
+          SameSite: 'Lax',
         })
         .status(200)
-        .json(savedUser._doc);
+        // .json(savedUser._doc);
     }
   } catch (err) {
     next(err);
