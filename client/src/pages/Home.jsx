@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Card from "../components/Card";
 import { api } from "../constant.js";
@@ -18,6 +18,16 @@ const Container = styled.div`
   @media (min-width: 1200px) {
     grid-template-columns: auto auto auto;
     justify-content: start;
+  }
+`;
+
+const Gap = styled.div`
+  height: 0px;
+  @media (max-width: 760px) {
+    height: 50px;
+  }
+  @media (max-width: 1200px) {
+    height: 30px;
   }
 `;
 
@@ -86,6 +96,7 @@ const Home = ({ type }) => {
       {videos.map((video) => (
         <Card key={video._id} video={video} />
       ))}
+      <Gap />
     </Container>
   );
 };

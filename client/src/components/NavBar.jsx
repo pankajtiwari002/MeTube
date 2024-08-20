@@ -87,6 +87,9 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 5px;
+  @media (max-width: 760px) {
+    display: none;
+  }
 `;
 
 const User = styled.div`

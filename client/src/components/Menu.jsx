@@ -3,7 +3,7 @@ import styled from "styled-components";
 import logoImg from "../img/logo.png";
 import { Scrollbar } from "react-scrollbars-custom";
 import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 import {
   AccountCircleOutlined,
@@ -124,16 +124,17 @@ const Gap = styled.div`
 const Menu = ({ darkMode, setDarkMode }) => {
   const { currentUser } = useSelector((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleLogOut = () => {
-    Cookies.remove('access_token', { path: '/' });
-    localStorage.removeItem('persist:root');
+    Cookies.remove("access_token", { path: "/" });
+    localStorage.removeItem("persist:root");
     Promise.resolve(dispatch(logout()));
-  }
+  };
 
   const changeMode = () => {
     setDarkMode((prev) => !prev);
+    toggleMenu();
   };
 
   const toggleMenu = () => {
@@ -145,17 +146,17 @@ const Menu = ({ darkMode, setDarkMode }) => {
       <Hamburger onClick={toggleMenu}>
         {isOpen ? <CloseIcon /> : <MenuIcon />}
       </Hamburger>
-        <Container isOpen={isOpen}>
-          <Scrollbar style={{ width: "200px", height: "100vh" }}>
+      <Container isOpen={isOpen}>
+        <Scrollbar style={{ width: "200px", height: "100vh" }}>
           <Wrapper>
             <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-              <Logo>
+              <Logo onClick={toggleMenu}>
                 <Img src={logoImg} />
                 VidZilla
               </Logo>
             </Link>
             <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-              <Item>
+              <Item onClick={toggleMenu}>
                 <Home />
                 Home
               </Item>
@@ -164,7 +165,7 @@ const Menu = ({ darkMode, setDarkMode }) => {
               to="/trend"
               style={{ textDecoration: "none", color: "inherit" }}
             >
-              <Item>
+              <Item onClick={toggleMenu}>
                 <ExploreOutlined />
                 Explore
               </Item>
@@ -173,7 +174,7 @@ const Menu = ({ darkMode, setDarkMode }) => {
               to="/sub"
               style={{ textDecoration: "none", color: "inherit" }}
             >
-              <Item>
+              <Item onClick={toggleMenu}>
                 <Subscriptions />
                 Subscription
               </Item>
@@ -183,8 +184,11 @@ const Menu = ({ darkMode, setDarkMode }) => {
               <VideoLibraryOutlined />
               Library
             </Item>
-            <Link to="/history" style={{ textDecoration: "none", color: "inherit" }}>
-              <Item>
+            <Link
+              to="/history"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item onClick={toggleMenu}>
                 <HistoryOutlined />
                 History
               </Item>
@@ -193,7 +197,7 @@ const Menu = ({ darkMode, setDarkMode }) => {
               <>
                 <Login>
                   <Link to="signin" style={{ textDecoration: "none" }}>
-                    <Button>
+                    <Button onClick={toggleMenu}>
                       <AccountCircleOutlined />
                       SIGN IN
                     </Button>
@@ -204,10 +208,10 @@ const Menu = ({ darkMode, setDarkMode }) => {
             ) : (
               <>
                 <Login onClick={handleLogOut}>
-                    <Button>
-                      <AccountCircleOutlined />
-                      SIGN OUT
-                    </Button>
+                  <Button>
+                    <AccountCircleOutlined />
+                    SIGN OUT
+                  </Button>
                 </Login>
                 <Hr />
               </>
@@ -258,8 +262,8 @@ const Menu = ({ darkMode, setDarkMode }) => {
           <Gap />
           <Gap />
           <Gap />
-      </Scrollbar>
-        </Container>
+        </Scrollbar>
+      </Container>
     </MainContainer>
   );
 };

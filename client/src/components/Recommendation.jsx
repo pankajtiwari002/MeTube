@@ -12,6 +12,16 @@ const Container = styled.div`
   }
 `;
 
+const Gap = styled.div`
+  height: 0px;
+  @media (max-width: 760px) {
+    height: 50px;
+  }
+  @media (max-width: 1200px) {
+    height: 30px;
+  }
+`;
+
 const Recommendation = ({ currentVideoId, tags }) => {
   const [videos, setVideos] = useState([]);
 
@@ -34,6 +44,7 @@ const Recommendation = ({ currentVideoId, tags }) => {
             <Card type="sm" key={video._id} video={video} />
           )
       )}
+      <Gap />
     </Container>
   );
 };
