@@ -147,6 +147,7 @@ const Video = () => {
   const [channel, setChannel] = useState({});
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [lastSpaceBarTime, setLastSpaceBarTime] = useState(0);
 
   useEffect(() => {
     const addView = async () => {
@@ -306,12 +307,18 @@ const Video = () => {
   };
 
   const handleKeyPress = (event) => {
-    if (event.key == " " || event.code=="Space" || event.code==32) {
+    if (event.key == " " || event.code == "Space" || event.code == 32) {
       console.log("Space Bar Pressed");
-      if (isPlaying) {
-        videoRef.current.pause();
+      let time = Date.now();
+      if (time - lastSpaceBarTime > 500) {
+        setLastSpaceBarTime(time);
+        if (isPlaying) {
+          videoRef.current.pause();
+        } else {
+          videoRef.current.play();
+        }
       } else {
-        videoRef.current.play();
+        console.log("Ignore Space Bar");
       }
     } else if (event.shiftKey && event.key == ">") {
       if (videoRef.current.playbackRate != 2.0) {
@@ -326,18 +333,19 @@ const Video = () => {
 
   useEffect(() => {
     return () => {
-      if(videoRef.current){
+      console.log("hi");
+      if (videoRef.current) {
         videoRef.current
-        .requestPictureInPicture()
-        .then(() => {
-          console.log("Entered Picture-in-Picture mode");
-        })
-        .catch((error) => {
-          console.error("Failed to enter Picture-in-Picture mode:", error);
-        });
+          .requestPictureInPicture()
+          .then(() => {
+            console.log("Entered Picture-in-Picture mode");
+          })
+          .catch((error) => {
+            console.error("Failed to enter Picture-in-Picture mode:", error);
+          });
       }
     };
-  },[]);
+  }, []);
 
   return (
     <Container onKeyPress={handleKeyPress}>
@@ -348,7 +356,6 @@ const Video = () => {
           controls
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          onKeyPress={handleKeyPress}
         />
         {/* <VideoPlayer src={currentVideo?.videoUrl}/> */}
         <Title>{currentVideo?.title}</Title>
