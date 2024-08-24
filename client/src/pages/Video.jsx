@@ -6,7 +6,7 @@ import {
   ThumbUp,
   ThumbUpOutlined,
 } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import Comments from "../components/Comments";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +24,7 @@ import { format } from "timeago.js";
 import { subscription } from "../redux/userSlice";
 import Recommendation from "../components/Recommendation";
 import VideoDescription from "../components/VideoDescription";
-import defaultImage from "../img/profile_placeholder.jpg"
+import defaultImage from "../img/profile_placeholder.jpg";
 
 const Container = styled.div`
   display: flex;
@@ -109,7 +109,7 @@ const Description = styled.p`
 `;
 
 const Subscribe = styled.button`
-background-color: ${(props) => (props.subscribe ? "#000000a2" : "#cc1a00")};
+  background-color: ${(props) => (props.subscribe ? "#000000a2" : "#cc1a00")};
   color: white;
   border: none;
   border-radius: 3px;
@@ -142,9 +142,11 @@ const Video = () => {
 
   const videoId = useLocation().pathname.split("/")[2];
   const [flag, setFlag] = useState(
-    currentUser===null? false : currentUser.subscribedUsers.includes(videoId)
-   );
+    currentUser === null ? false : currentUser.subscribedUsers.includes(videoId)
+  );
   const [channel, setChannel] = useState({});
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const addView = async () => {
@@ -160,7 +162,7 @@ const Video = () => {
 
   useEffect(() => {
     const addToHistory = async () => {
-      if(!currentUser) return;
+      if (!currentUser) return;
       try {
         const res = await axios.post(
           `${api}/history/`,
@@ -205,7 +207,7 @@ const Video = () => {
   }, [videoId, dispatch]);
 
   const handleLike = async () => {
-    if(!currentUser) return;
+    if (!currentUser) return;
     try {
       const cookies = document.cookie.split(";");
       let access_token = "";
@@ -233,7 +235,7 @@ const Video = () => {
   };
 
   const handleDislike = async () => {
-    if(!currentUser) return;
+    if (!currentUser) return;
     try {
       const cookies = document.cookie.split(";");
       let access_token = "";
@@ -261,7 +263,7 @@ const Video = () => {
   };
 
   const handleSub = async () => {
-    if(!currentUser) return;
+    if (!currentUser) return;
     try {
       const cookies = document.cookie.split(";");
       let access_token = "";
@@ -283,7 +285,7 @@ const Video = () => {
             },
           }
         );
-        setFlag(false)
+        setFlag(false);
       } else {
         const res = await axios.put(
           `${api}/users/sub/${channel._id}`,
@@ -295,7 +297,7 @@ const Video = () => {
             },
           }
         );
-        setFlag(true)
+        setFlag(true);
       }
       dispatch(subscription(channel._id));
     } catch (err) {
@@ -303,10 +305,48 @@ const Video = () => {
     }
   };
 
+  const handleKeyPress = (event) => {
+    if (event.key == " ") {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+    } else if (event.key === ">") {
+      if (videoRef.current.playbackRate != 2.0) {
+        videoRef.current.playbackRate += 0.25;
+      }
+    } else if (event.key === "<") {
+      if (videoRef.current.playbackRate != 0.25) {
+        videoRef.current.playbackRate -= 0.25;
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      videoRef.current
+        .requestPictureInPicture()
+        .then(() => {
+          console.log("Entered Picture-in-Picture mode");
+        })
+        .catch((error) => {
+          console.error("Failed to enter Picture-in-Picture mode:", error);
+        });
+    };
+  });
+
   return (
     <Container>
       <Content>
-        <VideoFrame src={currentVideo?.videoUrl} controls />
+        <VideoFrame
+          ref={videoRef}
+          src={currentVideo?.videoUrl}
+          controls
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onKeyPress={handleKeyPress}
+        />
         {/* <VideoPlayer src={currentVideo?.videoUrl}/> */}
         <Title>{currentVideo?.title}</Title>
         <Details>
@@ -315,7 +355,8 @@ const Video = () => {
           </Info>
           <Buttons>
             <Button onClick={handleLike}>
-              {currentUser!==null && currentVideo?.likes?.includes(currentUser._id) ? (
+              {currentUser !== null &&
+              currentVideo?.likes?.includes(currentUser._id) ? (
                 <ThumbUp />
               ) : (
                 <ThumbUpOutlined />
@@ -323,7 +364,8 @@ const Video = () => {
               {currentVideo?.likes?.length}
             </Button>
             <Button onClick={handleDislike}>
-              {currentUser!==null && currentVideo?.dislikes?.includes(currentUser._id) ? (
+              {currentUser !== null &&
+              currentVideo?.dislikes?.includes(currentUser._id) ? (
                 <ThumbDown />
               ) : (
                 <ThumbDownOffAltOutlined />
@@ -341,7 +383,11 @@ const Video = () => {
         <Hr />
         <Channel>
           <ChannelInfo>
-            <Image src={channel.img && channel.img!=="" ? channel.img : defaultImage} />
+            <Image
+              src={
+                channel.img && channel.img !== "" ? channel.img : defaultImage
+              }
+            />
             <ChannelDetail>
               <ChannelName>{channel.name}</ChannelName>
               <ChannelCounter>{channel.Subscribers} subscribers</ChannelCounter>
@@ -350,9 +396,7 @@ const Video = () => {
             </ChannelDetail>
           </ChannelInfo>
           <Subscribe subscribe={flag} onClick={handleSub}>
-            {flag
-              ? "SUBSCRIBED"
-              : "SUBSCRIBE"}
+            {flag ? "SUBSCRIBED" : "SUBSCRIBE"}
           </Subscribe>
         </Channel>
         <Hr />
