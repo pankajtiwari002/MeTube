@@ -321,7 +321,9 @@ const Video = () => {
   useEffect(() => {
     return () => {
       console.log("hi");
-      if (videoRef.current) {
+      console.log("ref " + videoRef.current);
+      console.log("video " + videoRef);
+      // if (videoRef.current) {
         videoRef.current
           .requestPictureInPicture()
           .then(() => {
@@ -330,7 +332,7 @@ const Video = () => {
           .catch((error) => {
             console.error("Failed to enter Picture-in-Picture mode:", error);
           });
-      }
+      // }
     };
   }, []);
 
