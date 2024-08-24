@@ -307,27 +307,7 @@ const Video = () => {
   };
 
   const handleKeyPress = (event) => {
-    if (event.which == 32) {
-      console.log("Space Bar Pressed");
-      // let time = Date.now();
-      // if (time - lastSpaceBarTime > 500) {
-      //   setLastSpaceBarTime((prev) => time);
-        if (isPlaying) {
-          console.log("Space Bar play");
-          videoRef.current.pause();
-          setIsPlaying(false)
-          console.log("Space Bar play 1");
-        } 
-        if(!isPlaying){
-          console.log("Space Bar pause");
-          videoRef.current.play();
-          setIsPlaying(true)
-          console.log("Space Bar pause 1");
-        }
-      // } else {
-      //   console.log("Ignore Space Bar");
-      // }
-    } else if (event.shiftKey && event.key == ">") {
+    if (event.shiftKey && event.key == ">") {
       if (videoRef.current.playbackRate != 2.0) {
         videoRef.current.playbackRate += 0.25;
       }
