@@ -311,7 +311,7 @@ const Video = () => {
       console.log("Space Bar Pressed");
       let time = Date.now();
       if (time - lastSpaceBarTime > 500) {
-        setLastSpaceBarTime(time);
+        setLastSpaceBarTime((prev) => time);
         if (isPlaying) {
           videoRef.current.pause();
         } else {
@@ -356,6 +356,7 @@ const Video = () => {
           controls
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
+          onKeyPress={handleKeyPress}
         />
         {/* <VideoPlayer src={currentVideo?.videoUrl}/> */}
         <Title>{currentVideo?.title}</Title>
