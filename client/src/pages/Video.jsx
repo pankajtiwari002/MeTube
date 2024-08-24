@@ -146,8 +146,7 @@ const Video = () => {
   );
   const [channel, setChannel] = useState({});
   const videoRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [lastSpaceBarTime, setLastSpaceBarTime] = useState(0);
+  let videoElement = null;
 
   useEffect(() => {
     const addView = async () => {
@@ -319,12 +318,13 @@ const Video = () => {
   };
 
   useEffect(() => {
+    videoElement = videoRef.current;
     return () => {
       console.log("hi");
-      console.log("ref " + videoRef.current);
-      console.log("video " + videoRef);
-      // if (videoRef.current) {
-        videoRef.current
+      // console.log("ref " + videoRef.current);
+      // console.log("video " + videoRef);
+      if (videoElement) {
+        videoElement
           .requestPictureInPicture()
           .then(() => {
             console.log("Entered Picture-in-Picture mode");
@@ -332,7 +332,7 @@ const Video = () => {
           .catch((error) => {
             console.error("Failed to enter Picture-in-Picture mode:", error);
           });
-      // }
+      }
     };
   }, []);
 
@@ -343,8 +343,6 @@ const Video = () => {
           ref={videoRef}
           src={currentVideo?.videoUrl}
           controls
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
           onKeyPress={handleKeyPress}
         />
         {/* <VideoPlayer src={currentVideo?.videoUrl}/> */}
