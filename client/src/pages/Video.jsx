@@ -306,17 +306,18 @@ const Video = () => {
   };
 
   const handleKeyPress = (event) => {
-    if (event.key == " ") {
+    if (event.key == " " || event.code=="Space" || event.code==32) {
+      console.log("Space Bar Pressed");
       if (isPlaying) {
         videoRef.current.pause();
       } else {
         videoRef.current.play();
       }
-    } else if (event.key === ">") {
+    } else if (event.shiftKey && event.key == ">") {
       if (videoRef.current.playbackRate != 2.0) {
         videoRef.current.playbackRate += 0.25;
       }
-    } else if (event.key === "<") {
+    } else if (event.shiftKey && event.key == "<") {
       if (videoRef.current.playbackRate != 0.25) {
         videoRef.current.playbackRate -= 0.25;
       }
@@ -325,7 +326,8 @@ const Video = () => {
 
   useEffect(() => {
     return () => {
-      videoRef.current
+      if(videoRef.current){
+        videoRef.current
         .requestPictureInPicture()
         .then(() => {
           console.log("Entered Picture-in-Picture mode");
@@ -333,11 +335,12 @@ const Video = () => {
         .catch((error) => {
           console.error("Failed to enter Picture-in-Picture mode:", error);
         });
+      }
     };
-  });
+  },[]);
 
   return (
-    <Container>
+    <Container onKeyPress={handleKeyPress}>
       <Content>
         <VideoFrame
           ref={videoRef}
