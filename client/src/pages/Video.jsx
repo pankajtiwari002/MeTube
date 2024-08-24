@@ -328,6 +328,7 @@ const Video = () => {
           .requestPictureInPicture()
           .then(() => {
             console.log("Entered Picture-in-Picture mode");
+            videoElement.play();
           })
           .catch((error) => {
             console.error("Failed to enter Picture-in-Picture mode:", error);
@@ -337,7 +338,7 @@ const Video = () => {
   }, []);
 
   return (
-    <Container >
+    <Container>
       <Content>
         <VideoFrame
           ref={videoRef}
