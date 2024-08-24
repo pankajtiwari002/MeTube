@@ -315,11 +315,13 @@ const Video = () => {
         if (isPlaying) {
           console.log("Space Bar play");
           videoRef.current.pause();
+          setIsPlaying(false)
           console.log("Space Bar play 1");
         } 
         if(!isPlaying){
           console.log("Space Bar pause");
           videoRef.current.play();
+          setIsPlaying(true)
           console.log("Space Bar pause 1");
         }
       // } else {
