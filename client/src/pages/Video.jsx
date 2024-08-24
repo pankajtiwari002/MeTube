@@ -307,19 +307,19 @@ const Video = () => {
   };
 
   const handleKeyPress = (event) => {
-    if (event.key == " " || event.code == "Space" || event.code == 32) {
+    if (event.which == 32) {
       console.log("Space Bar Pressed");
-      let time = Date.now();
-      if (time - lastSpaceBarTime > 500) {
-        setLastSpaceBarTime((prev) => time);
+      // let time = Date.now();
+      // if (time - lastSpaceBarTime > 500) {
+      //   setLastSpaceBarTime((prev) => time);
         if (isPlaying) {
           videoRef.current.pause();
         } else {
           videoRef.current.play();
         }
-      } else {
-        console.log("Ignore Space Bar");
-      }
+      // } else {
+      //   console.log("Ignore Space Bar");
+      // }
     } else if (event.shiftKey && event.key == ">") {
       if (videoRef.current.playbackRate != 2.0) {
         videoRef.current.playbackRate += 0.25;
@@ -348,7 +348,7 @@ const Video = () => {
   }, []);
 
   return (
-    <Container onKeyPress={handleKeyPress}>
+    <Container >
       <Content>
         <VideoFrame
           ref={videoRef}
@@ -356,7 +356,7 @@ const Video = () => {
           controls
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
         />
         {/* <VideoPlayer src={currentVideo?.videoUrl}/> */}
         <Title>{currentVideo?.title}</Title>
