@@ -94,7 +94,7 @@ export const signup = async (req, res, next) => {
       .cookie("access_token", token, {
         httpOnly: true, // Protects against XSS attacks
         secure: true, // Ensures the cookie is only sent over HTTPS
-        sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
+        sameSite: "Lax", // Allows cross-site cookie usage (e.g., with OAuth)
         path: "/", // Available throughout the website
         domain: ".onrender.com",
       })
@@ -124,7 +124,7 @@ export const signin = async (req, res, next) => {
       .cookie("access_token", token, {
         httpOnly: true, // Protects against XSS attacks
         secure: true, // Ensures the cookie is only sent over HTTPS
-        sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
+        sameSite: "Lax", // Allows cross-site cookie usage (e.g., with OAuth)
         path: "/", // Available throughout the website
         domain: ".onrender.com",
       })
@@ -150,7 +150,7 @@ export const googleSignIn = async (req, res, next) => {
         .cookie("access_token", token, {
           httpOnly: true, // Protects against XSS attacks
           secure: true, // Ensures the cookie is only sent over HTTPS
-          sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
+          sameSite: "Lax", // Allows cross-site cookie usage (e.g., with OAuth)
           path: "/", // Available throughout the website
           domain: ".onrender.com",
         })
@@ -168,9 +168,9 @@ export const googleSignIn = async (req, res, next) => {
         .cookie("access_token", token, {
           httpOnly: true, // Protects against XSS attacks
           secure: true, // Ensures the cookie is only sent over HTTPS
-          sameSite: "None", // Allows cross-site cookie usage (e.g., with OAuth)
+          sameSite: "Lax", // Allows cross-site cookie usage (e.g., with OAuth)
           path: "/", // Available throughout the website
-          domain: ".onrender.com", 
+          domain: ".onrender.com",
         })
         .status(200);
       // .json(savedUser._doc);
