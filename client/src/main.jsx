@@ -18,6 +18,8 @@ import History from "./pages/History.jsx";
 import Profile from "./pages/Profile.jsx";
 import LogIn from "./pages/LogIn.jsx";
 import SignInWrapper from "./pages/SignInWrapper.jsx";
+import SavedVideos from "./pages/SavedVideo.jsx";
+import Tags from "./pages/Tags.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,6 +28,12 @@ const router = createBrowserRouter(
       <Route path="trend" element={<Home type="trend" />} />
       <Route path="sub" element={<Home type="sub" />} />
       <Route path="history" element={<History />} />
+      <Route path="savedVideos" element={<SavedVideos />} />
+      <Route path="music" element={<Tags tag="music" />} />
+      <Route path="sports" element={<Tags tag="sports" />} />
+      <Route path="gaming" element={<Tags tag="gaming" />} />
+      <Route path="movies" element={<Tags tag="movies" />} />
+      <Route path="news" element={<Tags tag="news" />} />
       <Route path="profile" element={<Profile />} />
       <Route path="search" element={<Search />} />
       <Route path="video/:id" element={<Video />} />

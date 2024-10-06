@@ -1,12 +1,13 @@
 import {
-  AddTaskOutlined,
+  BookmarkAdded,
+  BookmarkBorderOutlined,
   ReplyOutlined,
   ThumbDown,
   ThumbDownOffAltOutlined,
   ThumbUp,
   ThumbUpOutlined,
 } from "@mui/icons-material";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import styled from "styled-components";
 import Comments from "../components/Comments";
 import { useDispatch, useSelector } from "react-redux";
@@ -147,6 +148,8 @@ const Video = () => {
   const [channel, setChannel] = useState({});
   const videoRef = useRef(null);
   let videoElement = null;
+  const [savedVideo, setSavedVideo] = useState(false);
+  const [savedVideoId, setSavedVideoId] = useState(null);
 
   useEffect(() => {
     const addView = async () => {
@@ -159,6 +162,71 @@ const Video = () => {
     };
     addView();
   }, [videoId]);
+
+  const savedVideoToWatchLater = async () => {
+    try {
+      console.log("savedVideoToWatchLater Called");
+      if (!savedVideo) {
+        console.log("Add into Saved Video");
+        const res = await axios.post(
+          `${api}/savedVideo/`,
+          {
+            userId: currentUser._id,
+            videoId: videoId,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log(res.data);
+        setSavedVideoId(res.data._id);
+        setSavedVideo(true);
+      } else {
+        const res = await axios.delete(`${api}/savedVideo/${savedVideoId}`, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        setSavedVideoId(null);
+        setSavedVideo(false);
+        console.log(res);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    const checkAlreadySaved = async () => {
+      try {
+        const res = await axios.post(
+          `${api}/savedVideo/check`,
+          {
+            userId: currentUser._id,
+            videoId: videoId,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log(res.data);
+        if (res.data.length != 0) {
+          setSavedVideo(true);
+          setSavedVideoId(res.data[0]._id);
+        } else setSavedVideo(false);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkAlreadySaved();
+  });
 
   useEffect(() => {
     const addToHistory = async () => {
@@ -374,8 +442,8 @@ const Video = () => {
             <Button>
               <ReplyOutlined /> Share
             </Button>
-            <Button>
-              <AddTaskOutlined /> Save
+            <Button onClick={savedVideoToWatchLater}>
+              {savedVideo ? <BookmarkAdded /> : <BookmarkBorderOutlined />}
             </Button>
           </Buttons>
         </Details>

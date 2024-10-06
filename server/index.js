@@ -5,6 +5,7 @@ import userRoutes from "./routes/users.js";
 import commentRoutes from "./routes/comments.js";
 import videoRoutes from "./routes/videos.js";
 import historyRoutes from "./routes/history.js";
+import savedVideoRoutes from "./routes/savedVideo.js";
 import authRoutes from "./routes/auth.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -63,6 +64,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/videos", videoRoutes);
 app.use("/api/history", historyRoutes);
+app.use("/api/history", savedVideoRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/auth", authRoutes);
 
@@ -70,12 +72,16 @@ app.get("/", (req, res) => {
   res.send("Hello");
 });
 
-app.get("/email",async (req,res) => {
+app.get("/email", async (req, res) => {
   try {
-    const info = await sendOtp("pankajtiwari.cse25@jecrc.ac.in","Pankaj Tiwari","123456");
-    res.json(info)
+    const info = await sendOtp(
+      "pankajtiwari.cse25@jecrc.ac.in",
+      "Pankaj Tiwari",
+      "123456"
+    );
+    res.json(info);
   } catch (error) {
-    console.log(error)
-    res.send("error occur")
+    console.log(error);
+    res.send("error occur");
   }
-})
+});

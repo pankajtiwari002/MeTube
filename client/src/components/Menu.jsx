@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import logoImg from "../img/logo.png";
+import logoImg from "../img/vidzilla2.png";
 import { Scrollbar } from "react-scrollbars-custom";
 import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
 import Cookies from "js-cookie";
@@ -66,7 +66,7 @@ const Logo = styled.div`
 `;
 
 const Img = styled.img`
-  height: 25px;
+  height: 50px;
 `;
 
 const Item = styled.div`
@@ -180,10 +180,15 @@ const Menu = ({ darkMode, setDarkMode }) => {
               </Item>
             </Link>
             <Hr />
-            <Item>
-              <VideoLibraryOutlined />
-              Library
-            </Item>
+            <Link
+              to="/savedVideos"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item>
+                <VideoLibraryOutlined />
+                Library
+              </Item>
+            </Link>
             <Link
               to="/history"
               style={{ textDecoration: "none", color: "inherit" }}
@@ -216,31 +221,52 @@ const Menu = ({ darkMode, setDarkMode }) => {
                 <Hr />
               </>
             )}
-            <Title>Best of YouTube</Title>
-            <Item>
-              <LibraryMusicOutlined />
-              Music
-            </Item>
-            <Item>
-              <SportsBasketballOutlined />
-              Sports
-            </Item>
-            <Item>
-              <SportsEsportsOutlined />
-              Gaming
-            </Item>
-            <Item>
-              <MovieOutlined />
-              Movies
-            </Item>
-            <Item>
-              <ArticleOutlined />
-              News
-            </Item>
-            <Item>
-              <LiveTvOutlined />
-              Live
-            </Item>
+            <Title>Best of VidZilla</Title>
+            <Link
+              to="/music"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item>
+                <LibraryMusicOutlined />
+                Music
+              </Item>
+            </Link>
+            <Link
+              to="/sports"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item>
+                <SportsBasketballOutlined />
+                Sports
+              </Item>
+            </Link>
+            <Link
+              to="/gaming"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item>
+                <SportsEsportsOutlined />
+                Gaming
+              </Item>
+            </Link>
+            <Link
+              to="/movies"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item>
+                <MovieOutlined />
+                Movies
+              </Item>
+            </Link>
+            <Link
+              to="/news"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Item>
+                <ArticleOutlined />
+                News
+              </Item>
+            </Link>
             <Hr />
             <Item>
               <SettingsOutlined />

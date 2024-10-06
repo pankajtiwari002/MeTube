@@ -1,8 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { format } from "timeago.js";
 import { api } from "../constant.js";
+
+const Video = styled.video`
+  /* position: absolute; */
+  top: 0;
+  left: 0;
+  flex: 1;
+  width: 100%;
+  min-height: ${(props) => (props.type === "sm" ? "120px" : "220px")};
+  max-height: ${(props) => (props.type === "sm" ? "120px" : "240px")};
+  border-radius: 5%;
+  background-color: #999;
+  display: none;
+  object-fit: cover;
+`;
+
+const Image = styled.img`
+  flex: 1;
+  width: 100%;
+  min-height: ${(props) => (props.type === "sm" ? "120px" : "220px")};
+  max-height: ${(props) => (props.type === "sm" ? "120px" : "240px")};
+  border-radius: 5%;
+  background-color: #999;
+  object-fit: cover;
+`;
 
 const Container = styled.div`
   max-width: ${(props) => props.type !== "sm" && "520px"};
@@ -12,18 +36,17 @@ const Container = styled.div`
   cursor: pointer;
   display: ${(props) => (props.type === "sm" ? "flex" : "")};
   gap: ${(props) => props.type === "sm" && "10px"};
-  @media (min-width: 760px){
+  @media (min-width: 760px) {
     display: ${(props) => props.search && "none"};
   }
-`;
-
-const Image = styled.img`
-  flex: 1;
-  width: 100%;
-  min-height: ${(props) => (props.type === "sm" ? "120px" : "220px")};
-  max-height: ${(props) => (props.type === "sm" ? "120px" : "280px")};
-  border-radius: 5%;
-  background-color: #999;
+  &:hover {
+    ${Video} {
+      display: ${(props) => props.type !== "sm" && "block"};
+    }
+    ${Image} {
+      display: ${(props) => props.type !== "sm" && "none"};
+    }
+  }
 `;
 
 const Details = styled.div`
@@ -70,8 +93,9 @@ const Info = styled.div`
   color: ${({ theme }) => theme.textSoft};
 `;
 
-const Card = ({ type, video,search }) => {
+const Card = ({ type, video, search }) => {
   const [channel, setChannel] = useState({});
+  const videoRef = useRef(null);
 
   useEffect(() => {
     console.log("card");
@@ -88,13 +112,33 @@ const Card = ({ type, video,search }) => {
     fetchchannel();
   }, [video.userId]);
 
+  const handleMouseEnter = () => {
+    if (videoRef.current && type != "sm") {
+      console.log("HELLL");
+      videoRef.current.play(); // Play the video when the mouse enters
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (videoRef.current && type != "sm") {
+      videoRef.current.pause(); // Pause the video when the mouse leaves
+      videoRef.current.currentTime = 0; // Optional: Reset video to start
+    }
+  };
+
   return (
     <Link
       to={`/video/${video._id}`}
       style={{ textDecoration: "none", color: "inherit" }}
     >
-      <Container type={type} search={search}>
+      <Container
+        type={type}
+        search={search}
+        onMouseEnter={handleMouseEnter} // Attach play on hover
+        onMouseLeave={handleMouseLeave} // Attach pause on hover end
+      >
         <Image type={type} src={video.imgUrl} />
+        <Video ref={videoRef} type={type} src={video.videoUrl} />
         <Details type={type}>
           <ChannelImage type={type} src={channel.img} />
           <Texts>
